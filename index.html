@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pureza da Água</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 2rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header h1 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+      font-size: 2.5rem;
+      letter-spacing: 1px;
+    }
+    header p {
+      margin: 0 0 1.5rem 0;
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+    #refreshButton {
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #0072ff;
+      background: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,114,255,0.4);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    #refreshButton:hover {
+      background: #0072ff;
+      color: #fff;
+    }
+    main {
+      flex-grow: 1;
+      padding: 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .purity-section, section {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    .purity-percentage {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    section h2 {
+      margin-bottom: 1rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pureza da Água</h1>
+    <p>Aperte o botão para atualizar os dados</p>
+    <button id="refreshButton" aria-label="Atualizar dados">Atualizar Dados</button>
+  </header>
+  <main>
+    <div class="purity-section">
+      <h2>Porcentagem de Pureza (%)</h2>
+      <div class="purity-percentage" id="purityPercentage">--</div>
+    </div>
+
+    <section>
+      <h2>TDS (Solidos na Água)</h2>
+      <div class="purity-percentage" id="conductivity">--</div>
+    </section>
+
+    <section>
+      <h2>Nível de pH</h2>
+      <div class="purity-percentage" id="phLevel">--</div>
+    </section>
+
+    <section>
+      <h2>Turbidez (NTU)</h2>
+      <div class="purity-percentage" id="turbidity">--</div>
+    </section>
+
+    <section>
+      <h2>Temperatura (°C)</h2>
+      <div class="purity-percentage" id="temperature">--</div>
+    </section>
+  </main>
+  <footer>
+    &copy; 2025 Projeto de Monitoramento da Água. Todos os direitos reservados.
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyBkIhnz2dQpH5PNANPTwKdBNj0Y8Ii_LRU",
+  authDomain: "os-automaticos.firebaseapp.com",
+  databaseURL: "https://os-automaticos-default-rtdb.firebaseio.com",
+  projectId: "os-automaticos",
+  storageBucket: "os-automaticos.firebasestorage.app",
+  messagingSenderId: "336039201033",
+  appId: "1:336039201033:web:95bdb4cddbaaf8fef0ebd8",
+  measurementId: "G-QWJ1LXGHJ0"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function atualizarDados() {
+      try {
+        const snapshot = await get(ref(db, 'sensores'));
+        if (snapshot.exists()) {
+          const dados = snapshot.val();
+          document.getElementById('purityPercentage').innerText = dados.pureza;
+          document.getElementById('conductivity').innerText = dados.condutividade;
+          document.getElementById('phLevel').innerText = dados.ph;
+          document.getElementById('turbidity').innerText = dados.turbidez;
+          document.getElementById('temperature').innerText = dados.temperatura;
+        } else {
+          alert("Nenhum dado encontrado.");
+        }
+      } catch (erro) {
+        console.error("Erro ao buscar dados:", erro);
+        alert("Erro ao buscar dados.");
+      }
+    }
+
+    document.getElementById('refreshButton').addEventListener('click', atualizarDados);
+
+    // Carregar ao abrir também (opcional)
+    atualizarDados();
+  </script>
+</body>
+</html>
